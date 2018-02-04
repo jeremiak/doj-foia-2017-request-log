@@ -66,20 +66,31 @@ function unique(data) {
   return u
 }
 
+function formatDate(date) {
+  const opts = {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  }
+  return date.toLocaleDateString('en-US', opts)
+}
+
 function updateCurrent(current) {
   const dur = (current['Closed Date'] - current['Submitted Date']) / msPerDay
   const fields = [
     { name: 'tracking-number', key: 'Tracking Number'},
     { name: 'disposition', key: 'Disposition'},
     { name: 'sub-office', key: 'Sub-Office'},
-    { name: 'submitted-date', key: 'Submitted Date'},
-    { name: 'closed-date', key: 'Closed Date'},
+    { name: 'submitted-date', key: 'Submitted Date', fmt: d => formatDate(d) },
+    { name: 'closed-date', key: 'Closed Date', fmt: d => formatDate(d) },
     { name: 'details', key: 'Detail' },
   ]
   fields.forEach(field => {
     const name = `[name="${field.name}"]`
     const $el = $currentDurationEl.querySelector(name)
-    $el.value = current[field.key]
+    const value = current[field.key]
+    $el.value = field.fmt ? field.fmt(value) : value
   })
 
   $currentDurationEl.querySelector('[name="duration"]').value = parseInt(dur)
