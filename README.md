@@ -15,3 +15,5 @@ data comes from this [foia request on muckrock.com](https://www.muckrock.com/foi
 - what was the longest request? what were the longest 5?
 - what was the quickest request? what were the quickest 5?
 - which office got the most requests? which office had the highest denial rate?
+- what about a three dimensional chart (circle size = days in duration, color = office, something else?)
+- use the form interface as a detail explorer
