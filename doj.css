@@ -1,0 +1,103 @@
+body {
+  font-family: monospace;
+}
+
+main {
+  margin: 0 auto;
+  width: 80%;
+}
+
+footer {
+  border-top: 1px solid black;
+  clear: both;
+  margin-top: 1rem;
+  text-align: center;
+  width: 100%;
+}
+
+h1 {
+  border-bottom: 2px solid black;
+  font-family: monospace;
+}
+
+p {
+  margin-bottom:.4rem;
+  margin-top:.4rem;
+}
+
+#duration-slider {
+  float: left;
+  overflow-x: scroll;
+  width: 50%;
+}
+
+#duration-slider-inner {
+  width: 200%;
+}
+
+#duration-chart {
+  margin-top: 2em;
+  position: relatvie;
+}
+
+#duration-current,
+#duration-legend  {
+  float: left;
+  width: 49.8%;
+}
+
+#duration-chart svg {
+  float: left;
+  width: 50%;
+}
+
+#duration-chart rect:hover {
+  fill: black;
+}
+
+#duration-current > div {
+  border: 1px solid black;
+  position: relative;
+  width: 100%;
+}
+
+#duration-current > div label {
+  font-family: sans-serif;
+  font-size: .4rem;
+  left: .2rem;
+  position: absolute;
+  text-transform: uppercase;
+  top: .2rem;
+}
+
+#duration-current > div input,
+#duration-current > div textarea {
+  border: none;
+  color: black;
+  font-size: .8rem;
+  font-family: monospace;
+  line-height: 1.7rem;
+  padding-bottom: 0;
+  padding-left: .1rem;
+  padding-top: .6rem;
+  width: 400px;
+}
+
+table {
+  border: none;
+}
+
+th {
+  border-bottom: 1px solid black;
+  text-align: left;
+}
+
+tr:nth-child(even) {
+  background-color: rgba(10, 10, 10, 0.2);
+}
+
+td {
+  border: none;
+  margin: 0;
+  padding: .1rem;
+}

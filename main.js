@@ -14,19 +14,46 @@ function getAllDates(data) {
   return closed.concat(submitted)
 }
 
-function loadLegend(el, leg) {
-  const tr = d3.select(el)
-    .selectAll('div')
-    .data(leg)
-    .enter()
-    .append('tr')
+function getLegendData(data) {
+  const dispositions = data.map(d => d['Disposition'])
+  const volumeCountCache = {}
+  const legendData = unique(dispositions).sort((a, b) => {
+    if(a < b) return -1;
+    if(a > b) return 1;
+    return 0;
+  }).map(d => {
+    if (!volumeCountCache[d]) {
+      const match = dispositions.filter(x => x === d)
+      volumeCountCache[d] = match.length
+    }
+    return d
+  }).map(d => ({
+    name: d,
+    volume: volumeCountCache[d],
+    percent: (volumeCountCache[d] / dispositions.length) * 100,
+  }))
 
-  tr.append('td').text(l => l.name)
-  tr.append('td').append('div')
-    .style('background-color', l => l.color)
-    .style('display', 'block')
-    .style('height', '10px')
-    .style('width', '10px')
+  return legendData
+}
+
+function handleLegendClick(e) {
+  const nameFromRow = e.target.closest('tr').querySelectorAll('td')[0].innerText
+  const filtered = window.data.filter(d => d['Disposition'] === nameFromRow)
+  updateData(filtered)
+}
+
+function loadLegend(el, leg) {
+  const rows = leg.map(l => {
+    return `<tr>
+      <td>${l.name}</td>
+      <td>
+        <div style="background-color: ${colors(l.name)}; display: block; height: 10px; width: 10px;"
+      </td>
+      <td>${l.volume}</td>
+      <td>${l.percent.toFixed(2)}%</td>
+    </tr>`
+  })
+  document.querySelector(el).innerHTML = rows.join('')
 }
 
 function unique(data) {
@@ -39,62 +66,81 @@ function unique(data) {
   return u
 }
 
-function updateCurrentHover(current) {
+function updateCurrent(current) {
+  const dur = (current['Closed Date'] - current['Submitted Date']) / msPerDay
+  const fields = [
+    { name: 'tracking-number', key: 'Tracking Number'},
+    { name: 'disposition', key: 'Disposition'},
+    { name: 'sub-office', key: 'Sub-Office'},
+    { name: 'submitted-date', key: 'Submitted Date'},
+    { name: 'closed-date', key: 'Closed Date'},
+    { name: 'details', key: 'Detail' },
+  ]
+  fields.forEach(field => {
+    const name = `[name="${field.name}"]`
+    const $el = $currentDurationEl.querySelector(name)
+    $el.value = current[field.key]
+  })
 
+  $currentDurationEl.querySelector('[name="duration"]').value = parseInt(dur)
 }
 
 function updateData(data) {
-  const withDates = coerceDateCols(data).sort((a, b) => {
+  const svgHeight = 500
+  const withDates = data.sort((a, b) => {
     return a['Submitted Date'] - b['Submitted Date']
   })
-  const allDates = getAllDates(withDates)
 
   const x = d3.scaleTime()
-    .domain(d3.extent(allDates))
+    .domain(d3.extent(getAllDates(withDates)))
     .range([0, 500])
 
   const y = d3.scaleLinear()
     .domain([1, data.length + 1])
-    .range([0, 500])
+    .range([0, svgHeight])
 
   const bottomAxis = d3.axisBottom(x)
   const topAxis = d3.axisTop(x)
 
-  const dispositions = data.map(d => d['Disposition'])
-  const legendData = unique(dispositions).sort((a, b) => {
-    if(a < b) return -1;
-    if(a > b) return 1;
-    return 0;
-  }).map(d => ({
-    name: d,
-    color: colors(d)
-  }))
-  loadLegend('#legend tbody', legendData)
+  const legendData = getLegendData(data)
+  loadLegend('#duration-legend tbody', legendData)
 
   svg.append('g')
-    .attr('transform', 'translate(0,0)')
+    .attr('transform', 'translate(0,570)')
     .call(bottomAxis);
 
   svg.append('g')
-    .attr('transform', 'translate(0,490)')
+    .attr('transform', 'translate(0,30)')
     .call(topAxis);
 
-  const rects = svg.selectAll('g')
-    .data(withDates)
-    .enter()
-    .append('g')
+  const rects = svg.selectAll('rect')
+    .data(withDates, d => d['Tracking Number'])
+
+  rects.attr('x', d => x(d['Submitted Date']))
+      .attr('y', (d, i) => y(i))
+      .attr('width', d => (x(d['Closed Date']) - x(d['Submitted Date'])))
+      .attr('height', () => (svgHeight / data.length))
+
+  rects.enter()
     .append('rect')
       .attr('x', d => x(d['Submitted Date']))
       .attr('y', (d, i) => y(i))
       .attr('width', d => (x(d['Closed Date']) - x(d['Submitted Date'])))
-      .attr('height', '2')
+      .attr('height', () => (svgHeight / data.length))
       .attr('fill', d => colors(d['Disposition']))
-      .on('mouseover', updateCurrentHover)
+    .on('mouseover', d => updateCurrent(d))
+
+  rects.exit().remove()
 }
 
+document.querySelector('#duration-legend').addEventListener('click', handleLegendClick)
+
+const $currentDurationEl = document.querySelector('#duration-current')
 const colors = d3.scaleOrdinal(d3.schemeCategory10)
-const svg = d3.select('svg')
-d3.csv('cleaned.csv', data => {
-  window.d = data.slice(0, 10)
+const msPerDay = 1000 * 60 * 60 * 24
+const svg = d3.select('#duration-chart svg')
+d3.csv('cleaned.csv', csv => {
+  const data = coerceDateCols(csv)
+  window.data = data
   updateData(data)
 })

@@ -2,78 +2,69 @@
 <html lang="en">
   <head>
     <title>DOJ FOIA Request Log</title>
-    <style>
-      main {
-        font-family: monospace;
-        margin: 0 auto;
-        width: 80%;
-      }
-
-      h1 {
-        font-family: monospace;
-      }
-
-      p {
-        margin-bottom:.4rem;
-        margin-top:.4rem;
-      }
-
-      #chart {
-        margin-top: 2em;
-      }
-
-      #legend {
-        float: left;
-        width: 42%;
-      }
-
-      table {
-        border: none;
-      }
-
-      th {
-        border-bottom: 1px solid black;
-        text-align: left;
-      }
-
-      tr:nth-child(even) {
-        background-color: rgba(10, 10, 10, 0.2);
-      }
-
-      td {
-        border: none;
-        margin: 0;
-        padding: .1rem;
-      }
-
-      svg {
-        float: left;
-        width: 58%;
-      }
-    </style>
-
+    <link rel="stylesheet" href="doj.css">
   </head>
   <body>
     <main>
       <h1>DOJ FOIA Records</h1>
+      <h2>Background</h2>
       <p>Data comes from this <a href="https://www.muckrock.com/foi/united-states-of-america-10/foia-log-2017-department-of-justice-office-of-legislative-affairs-47116/">FOIA request on muckrock.com</a>, which asks for the "FOIA request log covering 2017, which includes a field showing the subject of each request and a field for the final disposition."</p>
+
+      <h2>How long did requests take to process?</h2>
       <p>Each line represents the duration of a FOIA request. It exists from the day it was submitted until it was completed and is color coded based on the "disposition" (outcome) of the request.</p>
-      <div id="chart">
-        <div id="legend">
-          <table>
-            <thead>
-              <tr>
-                <th>Disposition</th>
-                <th>Color</th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
+      <div id="duration-chart">
+        <div id="duration-slider">
+          <div id="duration-slider-inner">
+            <div id="duration-current">
+              <div>
+                <input type="text" id="tracking-number" name="tracking-number" disabled>
+                <label for="tracking-number">Tracking number</label>
+              </div>
+              <div>
+                <input type="text" id="disposition" name="disposition" disabled>
+                <label for="disposition">Disposition</label>
+              </div>
+              <div>
+                <input type="text" id="sub-office" name="sub-office" disabled>
+                <label for="sub-office">Sub-office</label>
+              </div>
+              <div>
+                <input type="text" id="submitted-date" name="submitted-date" disabled>
+                <label for="submitted-date">Submitted date</label>
+              </div>
+              <div>
+                <input type="text" id="closed-date" name="closed-date" disabled>
+                <label for="closed-date">Closed date</label>
+              </div>
+              <div>
+                <input type="text" id="duration" name="duration" disabled>
+                <label for="duration">Duration (days)</label>
+              </div>
+              <div>
+                <textarea rows="5" id="details" name="details" disabled></textarea>
+                <label for="details">Details</label>
+              </div>
+            </div>
+            <div id="duration-legend">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Disposition</th>
+                    <th>Color</th>
+                    <th>Volume</th>
+                    <th>Percent</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
         </div>
-        <svg width="500" height="500" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+        <svg width="500" height="600" viewBox="0 0 500 600" xmlns="http://www.w3.org/2000/svg">
         </svg>
       </div>
     </main>
+    <footer>Code for this project can be found on Github (<a href="https://jeremiak.github.io/doj-foia-2017-request-log/">https://jeremiak.github.io/doj-foia-2017-request-log/</a>)</footer>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.13.0/d3.min.js"></script>
     <script src="./main.js"></script>
   </body>
